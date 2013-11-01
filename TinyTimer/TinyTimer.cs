@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Diagnostics;
 
 namespace TinyTimer
 {
@@ -7,16 +7,19 @@ namespace TinyTimer
     {
         public static double Benchmark(Action action, int samples = 10)
         {
-            var times = new TimeSpan[samples];
+            long ticks = 0;
+
+            var sw = new Stopwatch();
 
             for (var i = 0; i < samples; i++)
             {
-                var start = DateTime.Now;
+                sw.Start();
                 action.Invoke();
-                times[i] = DateTime.Now - start;
+                ticks += sw.ElapsedTicks;
+                sw.Reset();
             }
 
-            return TimeSpan.FromTicks(times.Select(t=>t.Ticks).Sum() / samples).TotalMilliseconds;
+            return ticks / (double)samples;
         }
     }
 }
